@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rejoindre un chantier — MaConstruction</title>
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<link rel="stylesheet" href="style.css">
+<script>
+// Le code d'invitation est après le « # » : le navigateur ne l'envoie jamais au serveur, et cette page n'envoie rien.
+var code = decodeURIComponent(location.hash.slice(1)).replace(/\s/g, "");
+var valide = /^1\.[0-9a-f-]{36}\.[A-Za-z0-9_-]{43}$/.test(code);
+var ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+var android = /Android/.test(navigator.userAgent);
+// iPhone : bandeau de l'App Store (« Ouvrir » si l'app est installée, avec l'invitation ; sinon « Obtenir »).
+if (ios) document.write('<meta name="apple-itunes-app" content="app-id=6825257791' + (valide ? ', app-argument=maconstruction://rejoindre#' + code : '') + '">');
+</script>
+<style>
+.bouton{display:block;width:100%;box-sizing:border-box;text-align:center;padding:16px;border-radius:14px;font-size:18px;font-weight:600;text-decoration:none;border:0;cursor:pointer;margin:12px 0;font-family:inherit}
+.principal{background:var(--marine);color:#fff}.second{background:var(--carte);color:var(--marine)}
+.etapes li{margin:10px 0}.note{color:var(--doux);font-size:15px}[hidden]{display:none!important}
+</style></head>
+<body><main>
+<header><img src="logo.png" alt=""><strong>MaConstruction</strong></header>
+
+<div id="invitation" hidden>
+<h1>Votre conjoint vous invite à suivre votre chantier</h1>
+<p>Avec MaConstruction, vous suivez à deux le budget, les dépenses, les factures et les devis du même chantier. Gratuit, sans compte ni e-mail.</p>
+
+<div id="pour-ios" hidden>
+<button class="bouton principal" id="telecharger-ios">Télécharger MaConstruction</button>
+<a class="bouton second" id="ouvrir-ios" href="#">J’ai déjà l’application : rejoindre</a>
+<ol class="etapes">
+<li>Installez MaConstruction depuis l’App Store.</li>
+<li>Ouvrez-la : l’invitation est reprise toute seule. Touchez « Autoriser le collage » si l’iPhone le demande.</li>
+<li>Touchez « Rejoindre le chantier ». C’est fini.</li>
+</ol>
+</div>
+
+<div id="pour-android" hidden>
+<button class="bouton principal" id="telecharger-android">Télécharger MaConstruction</button>
+<a class="bouton second" id="ouvrir-android" href="#">J’ai déjà l’application : rejoindre</a>
+<ol class="etapes">
+<li>Installez MaConstruction depuis Google Play.</li>
+<li>Ouvrez-la : l’invitation est reprise toute seule.</li>
+<li>Touchez « Rejoindre le chantier ». C’est fini.</li>
+</ol>
+</div>
+
+<div id="pour-ordinateur" hidden>
+<p><strong>Ouvrez ce lien sur votre téléphone</strong>, ou scannez le QR code de votre conjoint avec l’appareil photo de votre téléphone.</p>
+</div>
+
+<p class="note">Ce lien donne accès au chantier : ne le transmettez à personne d’autre. Les données du chantier sont chiffrées sur les téléphones ; ni cette page ni MaConstruction ne peuvent les lire.</p>
+</div>
+
+<div id="incomplet" hidden>
+<h1>Lien d’invitation incomplet</h1>
+<p>Demandez à votre conjoint d’afficher de nouveau le QR code : dans MaConstruction, Plus › « Inviter mon conjoint ».</p>
+</div>
+
+<p><a href="https://apps.apple.com/fr/app/id6825257791">MaConstruction sur l’App Store</a> · <a href="https://play.google.com/store/apps/details?id=fr.maconstruction.app">sur Google Play</a></p>
+</main>
+<script>
+var lien = "https://mm4htvj7t7-droid.github.io/maconstruction/rejoindre#" + code;
+var appStore = "https://apps.apple.com/fr/app/id6825257791";
+var googlePlay = "https://play.google.com/store/apps/details?id=fr.maconstruction.app";
+
+// Copie l'invitation (reprise par l'app à son premier lancement), puis continue.
+function copierPuis(suite) {
+  var fait = false;
+  function continuer() { if (!fait) { fait = true; suite(); } }
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(lien).then(continuer, function () { copierAncien(); continuer(); });
+      setTimeout(continuer, 1500);
+      return;
+    }
+  } catch (e) {}
+  copierAncien();
+  continuer();
+}
+function copierAncien() {
+  try {
+    var t = document.createElement("textarea");
+    t.value = lien; t.setAttribute("readonly", ""); t.style.position = "fixed"; t.style.opacity = "0";
+    document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t);
+  } catch (e) {}
+}
+
+if (!valide) {
+  document.getElementById("incomplet").hidden = false;
+} else {
+  document.getElementById("invitation").hidden = false;
+  if (ios) {
+    document.getElementById("pour-ios").hidden = false;
+    document.getElementById("ouvrir-ios").href = "maconstruction://rejoindre#" + code;
+    document.getElementById("telecharger-ios").onclick = function () { copierPuis(function () { location.href = appStore; }); };
+  } else if (android) {
+    document.getElementById("pour-android").hidden = false;
+    // Ouvre l'app avec l'invitation (Chrome propose Google Play si elle manque).
+    document.getElementById("ouvrir-android").href = "intent://rejoindre?i=" + code + "#Intent;scheme=maconstruction;package=fr.maconstruction.app;end";
+    document.getElementById("telecharger-android").onclick = function () { copierPuis(function () { location.href = googlePlay; }); };
+  } else {
+    document.getElementById("pour-ordinateur").hidden = false;
+  }
+}
+</script>
+</body></html>
