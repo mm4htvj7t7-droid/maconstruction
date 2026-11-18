@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mm4htvj7t7-droid.github.io/maconstruction/sitemap.xml

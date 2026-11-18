@@ -3,62 +3,96 @@
 <title>Rejoindre un chantier — MaConstruction</title>
 <meta name="robots" content="noindex">
 <meta name="referrer" content="no-referrer">
+<!-- La page ne se connecte à rien : le code d'invitation (après le « # ») ne peut partir nulle part. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<link rel="icon" href="images/logo.png">
 <link rel="stylesheet" href="style.css">
 <script>
 // Le code d'invitation est après le « # » : le navigateur ne l'envoie jamais au serveur, et cette page n'envoie rien.
 var code = decodeURIComponent(location.hash.slice(1)).replace(/\s/g, "");
 var valide = /^1\.[0-9a-f-]{36}\.[A-Za-z0-9_-]{43}$/.test(code);
+// Audit 2.0 : le code est gardé en mémoire puis retiré de l'adresse, pour qu'il ne reste pas dans l'historique.
+try { if (location.hash) history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
 var ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
 var android = /Android/.test(navigator.userAgent);
 // iPhone : bandeau de l'App Store (« Ouvrir » si l'app est installée, avec l'invitation ; sinon « Obtenir »).
 if (ios) document.write('<meta name="apple-itunes-app" content="app-id=6825257791' + (valide ? ', app-argument=maconstruction://rejoindre#' + code : '') + '">');
 </script>
 <style>
-.bouton{display:block;width:100%;box-sizing:border-box;text-align:center;padding:16px;border-radius:14px;font-size:18px;font-weight:600;text-decoration:none;border:0;cursor:pointer;margin:12px 0;font-family:inherit}
-.principal{background:var(--marine);color:#fff}.second{background:var(--carte);color:var(--marine)}
-.etapes li{margin:10px 0}.note{color:var(--doux);font-size:15px}[hidden]{display:none!important}
-</style></head>
-<body><main>
-<header><img src="logo.png" alt=""><strong>MaConstruction</strong></header>
+.invitation{min-height:100vh;display:flex;align-items:center}
+.invitation .carte-invitation{max-width:560px;margin:0 auto;padding:40px 20px}
+.invitation h1{font-size:clamp(30px,6vw,42px);line-height:1.08;margin:6px 0 14px;font-weight:900}
+.invitation .bouton{width:100%;justify-content:center;margin:10px 0}
+.etapes{counter-reset:e;list-style:none;padding:0;margin:22px 0}
+.etapes li{counter-increment:e;position:relative;padding:4px 0 4px 40px;margin:8px 0;color:#C9D6E8}
+.etapes li::before{content:counter(e);position:absolute;left:0;top:3px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-weight:800;display:grid;place-items:center;font-size:15px}
+.note{color:#9FB0C8;font-size:15px}
+</style>
+</head>
+<body>
+<main class="heros invitation"><div class="carte-invitation">
+<a class="marque" href="./"><img src="images/logo.png" alt=""><span data-t="nom">MaConstruction</span></a>
 
 <div id="invitation" hidden>
-<h1>Votre conjoint vous invite à suivre votre chantier</h1>
-<p>Avec MaConstruction, vous suivez à deux le budget, les dépenses, les factures et les devis du même chantier. Gratuit, sans compte ni e-mail.</p>
+<p class="rubrique" style="margin-top:28px" data-t="rubrique">Partage en couple</p>
+<h1 data-t="titre">Votre conjoint vous invite à suivre <em style="font-style:normal;color:var(--accent)">votre chantier</em></h1>
+<p class="chapo" style="font-size:18px" data-t="chapo">Suivez à deux le budget, les dépenses, les factures et les devis du même chantier. Gratuit, sans compte ni e-mail.</p>
 
 <div id="pour-ios" hidden>
-<button class="bouton principal" id="telecharger-ios">Télécharger MaConstruction</button>
-<a class="bouton second" id="ouvrir-ios" href="#">J’ai déjà l’application : rejoindre</a>
+<button class="bouton principal" id="telecharger-ios" data-t="telecharger">Télécharger MaConstruction</button>
+<a class="bouton secondaire" id="ouvrir-ios" href="#" data-t="deja">J’ai déjà l’application : rejoindre</a>
 <ol class="etapes">
-<li>Installez MaConstruction depuis l’App Store.</li>
-<li>Ouvrez-la : l’invitation est reprise toute seule. Touchez « Autoriser le collage » si l’iPhone le demande.</li>
-<li>Touchez « Rejoindre le chantier ». C’est fini.</li>
+<li data-t="ios_1">Installez MaConstruction depuis l’App Store.</li>
+<li data-t="ios_2">Ouvrez-la : l’invitation est reprise toute seule. Touchez « Autoriser le collage » si l’iPhone le demande.</li>
+<li data-t="ios_3">Touchez « Rejoindre le chantier ». C’est fini.</li>
 </ol>
 </div>
 
 <div id="pour-android" hidden>
-<button class="bouton principal" id="telecharger-android">Télécharger MaConstruction</button>
-<a class="bouton second" id="ouvrir-android" href="#">J’ai déjà l’application : rejoindre</a>
+<button class="bouton principal" id="telecharger-android" data-t="telecharger">Télécharger MaConstruction</button>
+<a class="bouton secondaire" id="ouvrir-android" href="#" data-t="deja">J’ai déjà l’application : rejoindre</a>
 <ol class="etapes">
-<li>Installez MaConstruction depuis Google Play.</li>
-<li>Ouvrez-la : l’invitation est reprise toute seule.</li>
-<li>Touchez « Rejoindre le chantier ». C’est fini.</li>
+<li data-t="android_1">Installez MaConstruction depuis Google Play.</li>
+<li data-t="android_2">Ouvrez-la : l’invitation est reprise toute seule.</li>
+<li data-t="android_3">Touchez « Rejoindre le chantier ». C’est fini.</li>
 </ol>
 </div>
 
 <div id="pour-ordinateur" hidden>
-<p><strong>Ouvrez ce lien sur votre téléphone</strong>, ou scannez le QR code de votre conjoint avec l’appareil photo de votre téléphone.</p>
+<p class="chapo" style="font-size:18px" data-t="ordinateur"><strong style="color:#fff">Ouvrez ce lien sur votre téléphone</strong>, ou scannez le QR code de votre conjoint avec l’appareil photo de votre téléphone.</p>
 </div>
 
-<p class="note">Ce lien donne accès au chantier : ne le transmettez à personne d’autre. Les données du chantier sont chiffrées sur les téléphones ; ni cette page ni MaConstruction ne peuvent les lire.</p>
+<p class="note" data-t="note">Ce lien donne accès au chantier : ne le transmettez à personne d’autre. Les données du chantier sont chiffrées sur les téléphones ; ni cette page ni MaConstruction ne peuvent les lire.</p>
 </div>
 
 <div id="incomplet" hidden>
-<h1>Lien d’invitation incomplet</h1>
-<p>Demandez à votre conjoint d’afficher de nouveau le QR code : dans MaConstruction, Plus › « Inviter mon conjoint ».</p>
+<h1 style="margin-top:28px" data-t="incomplet_titre">Lien d’invitation incomplet</h1>
+<p class="chapo" style="font-size:18px" data-t="incomplet_texte">Demandez à votre conjoint d’afficher de nouveau le QR code : dans MaConstruction, Plus › « Inviter mon conjoint ».</p>
 </div>
 
-<p><a href="https://apps.apple.com/fr/app/id6825257791">MaConstruction sur l’App Store</a> · <a href="https://play.google.com/store/apps/details?id=fr.maconstruction.app">sur Google Play</a></p>
-</main>
+<p class="note" style="margin-top:28px"><a style="color:#C9D6E8" href="https://apps.apple.com/fr/app/id6825257791" data-t="sur_app_store">MaConstruction sur l’App Store</a> · <a style="color:#C9D6E8" href="https://play.google.com/store/apps/details?id=fr.maconstruction.app" data-t="sur_google_play">sur Google Play</a></p>
+</div></main>
+<script>
+// Textes en 7 langues (générés par _outils/generer.py). Langue du navigateur ; français sinon, comme avant.
+// Seuls des textes fixes sont insérés : le code d'invitation n'est jamais affiché ni envoyé.
+var TEXTES = {"fr":{"titre_page":"Rejoindre un chantier — MaConstruction","rubrique":"Partage en couple","titre":"Votre conjoint vous invite à suivre <em style=\"font-style:normal;color:var(--accent)\">votre chantier<\/em>","chapo":"Suivez à deux le budget, les dépenses, les factures et les devis du même chantier. Gratuit, sans compte ni e-mail.","telecharger":"Télécharger MaConstruction","deja":"J’ai déjà l’application : rejoindre","ios_1":"Installez MaConstruction depuis l’App Store.","ios_2":"Ouvrez-la : l’invitation est reprise toute seule. Touchez « Autoriser le collage » si l’iPhone le demande.","ios_3":"Touchez « Rejoindre le chantier ». C’est fini.","android_1":"Installez MaConstruction depuis Google Play.","android_2":"Ouvrez-la : l’invitation est reprise toute seule.","android_3":"Touchez « Rejoindre le chantier ». C’est fini.","ordinateur":"<strong style=\"color:#fff\">Ouvrez ce lien sur votre téléphone<\/strong>, ou scannez le QR code de votre conjoint avec l’appareil photo de votre téléphone.","note":"Ce lien donne accès au chantier : ne le transmettez à personne d’autre. Les données du chantier sont chiffrées sur les téléphones ; ni cette page ni MaConstruction ne peuvent les lire.","incomplet_titre":"Lien d’invitation incomplet","incomplet_texte":"Demandez à votre conjoint d’afficher de nouveau le QR code : dans MaConstruction, Plus › « Inviter mon conjoint ».","sur_app_store":"MaConstruction sur l’App Store","sur_google_play":"sur Google Play","nom":"MaConstruction"},"en":{"titre_page":"Join a project — Costitecture","rubrique":"Share with your partner","titre":"Your partner is inviting you to follow <em style=\"font-style:normal;color:var(--accent)\">your project<\/em>","chapo":"Keep track of the budget, expenses, invoices and quotes of the same project together. Free, no account or email needed.","telecharger":"Download Costitecture","deja":"I already have the app: join","ios_1":"Install Costitecture from the App Store.","ios_2":"Open it: the invitation is picked up automatically. Tap “Allow Paste” if your iPhone asks.","ios_3":"Tap “Join project”. That’s it.","android_1":"Install Costitecture from Google Play.","android_2":"Open it: the invitation is picked up automatically.","android_3":"Tap “Join project”. That’s it.","ordinateur":"<strong style=\"color:#fff\">Open this link on your phone<\/strong>, or scan your partner’s QR code with your phone’s camera.","note":"This link gives access to the project: don’t pass it on to anyone else. The project data is encrypted on the phones; neither this page nor Costitecture can read it.","incomplet_titre":"Incomplete invitation link","incomplet_texte":"Ask your partner to show the QR code again: in Costitecture, More › “Invite my partner”.","sur_app_store":"Costitecture on the App Store","sur_google_play":"on Google Play","nom":"Costitecture"},"es":{"titre_page":"Unirse a una obra — CuentaObra","rubrique":"Compartir en pareja","titre":"Tu pareja te invita a seguir <em style=\"font-style:normal;color:var(--accent)\">vuestra obra<\/em>","chapo":"Sigue en pareja el presupuesto previsto, los gastos, las facturas y los presupuestos de la misma obra. Gratis, sin cuenta ni correo.","telecharger":"Descargar CuentaObra","deja":"Ya tengo la app: unirme","ios_1":"Instala CuentaObra desde el App Store.","ios_2":"Ábrela: la invitación se recupera sola. Toca «Permitir pegar» si el iPhone te lo pide.","ios_3":"Toca «Unirse a la obra». Ya está.","android_1":"Instala CuentaObra desde Google Play.","android_2":"Ábrela: la invitación se recupera sola.","android_3":"Toca «Unirse a la obra». Ya está.","ordinateur":"<strong style=\"color:#fff\">Abre este enlace en tu teléfono<\/strong>, o escanea el código QR de tu pareja con la cámara de tu teléfono.","note":"Este enlace da acceso a la obra: no se lo pases a nadie más. Los datos de la obra están cifrados en los teléfonos; ni esta página ni CuentaObra pueden leerlos.","incomplet_titre":"Enlace de invitación incompleto","incomplet_texte":"Pide a tu pareja que vuelva a mostrar el código QR: en CuentaObra, Más › «Invitar a mi pareja».","sur_app_store":"CuentaObra en el App Store","sur_google_play":"en Google Play","nom":"CuentaObra"},"pt":{"titre_page":"Aderir a uma obra — Obraçamento","rubrique":"Partilha a dois","titre":"O seu cônjuge enviou-lhe um convite para acompanhar <em style=\"font-style:normal;color:var(--accent)\">a vossa obra<\/em>","chapo":"Acompanhem a dois o orçamento previsto, as despesas, as faturas e os orçamentos recebidos da mesma obra. Grátis, sem conta nem e-mail.","telecharger":"Descarregar o Obraçamento","deja":"Já tenho a aplicação: aderir","ios_1":"Instale o Obraçamento a partir da App Store.","ios_2":"Abra a aplicação: o convite é retomado automaticamente. Toque em «Permitir colar» se o iPhone o pedir.","ios_3":"Toque em «Aderir à obra». Já está.","android_1":"Instale o Obraçamento a partir do Google Play.","android_2":"Abra a aplicação: o convite é retomado automaticamente.","android_3":"Toque em «Aderir à obra». Já está.","ordinateur":"<strong style=\"color:#fff\">Abra esta ligação no seu telemóvel<\/strong> ou leia o código QR do seu cônjuge com a câmara do telemóvel.","note":"Esta ligação dá acesso à obra: não a envie a mais ninguém. Os dados da obra são encriptados nos telemóveis; nem esta página nem o Obraçamento conseguem lê-los.","incomplet_titre":"Ligação de convite incompleta","incomplet_texte":"Peça ao seu cônjuge para mostrar novamente o código QR: no Obraçamento, Mais › «Convidar o meu cônjuge».","sur_app_store":"Obraçamento na App Store","sur_google_play":"no Google Play","nom":"Obraçamento"},"de":{"titre_page":"Einem Projekt beitreten – Ziegeld","rubrique":"Mit Partner teilen","titre":"Dein Partner lädt dich ein, <em style=\"font-style:normal;color:var(--accent)\">euer Bauprojekt<\/em> zu verfolgen","chapo":"Verfolgt zu zweit Budget, Ausgaben, Rechnungen und Angebote desselben Bauprojekts. Kostenlos, ohne Konto und E-Mail.","telecharger":"Ziegeld herunterladen","deja":"Ich habe die App schon: beitreten","ios_1":"Installiere Ziegeld aus dem App Store.","ios_2":"Öffne die App: Die Einladung wird automatisch übernommen. Tippe auf „Einsetzen erlauben“, wenn das iPhone danach fragt.","ios_3":"Tippe auf „Projekt beitreten“. Fertig.","android_1":"Installiere Ziegeld über Google Play.","android_2":"Öffne die App: Die Einladung wird automatisch übernommen.","android_3":"Tippe auf „Projekt beitreten“. Fertig.","ordinateur":"<strong style=\"color:#fff\">Öffne diesen Link auf deinem Smartphone<\/strong> oder scanne den QR-Code deines Partners mit der Kamera deines Smartphones.","note":"Dieser Link gibt Zugriff auf das Projekt: Gib ihn an niemanden weiter. Die Projektdaten sind auf den Smartphones verschlüsselt; weder diese Seite noch Ziegeld kann sie lesen.","incomplet_titre":"Einladungslink unvollständig","incomplet_texte":"Bitte deinen Partner, den QR-Code erneut anzuzeigen: in Ziegeld unter Mehr › „Partner einladen“.","sur_app_store":"Ziegeld im App Store","sur_google_play":"bei Google Play","nom":"Ziegeld"},"it":{"titre_page":"Unisciti a un cantiere — ContoCantiere","rubrique":"Condividi in coppia","titre":"Il tuo partner ti invita a seguire <em style=\"font-style:normal;color:var(--accent)\">il vostro cantiere<\/em>","chapo":"Seguite in due il budget, le spese, le fatture e i preventivi dello stesso cantiere. Gratis, senza account né e-mail.","telecharger":"Scarica ContoCantiere","deja":"Ho già l’app: unisciti","ios_1":"Installa ContoCantiere dall’App Store.","ios_2":"Aprila: l’invito viene recuperato da solo. Tocca «Consenti incolla» se l’iPhone lo chiede.","ios_3":"Tocca «Unisciti al cantiere». Fatto.","android_1":"Installa ContoCantiere da Google Play.","android_2":"Aprila: l’invito viene recuperato da solo.","android_3":"Tocca «Unisciti al cantiere». Fatto.","ordinateur":"<strong style=\"color:#fff\">Apri questo link sul tuo telefono<\/strong>, oppure scansiona il codice QR del tuo partner con la fotocamera del telefono.","note":"Questo link dà accesso al cantiere: non inoltrarlo a nessun altro. I dati del cantiere sono crittografati sui telefoni; né questa pagina né ContoCantiere possono leggerli.","incomplet_titre":"Link d’invito incompleto","incomplet_texte":"Chiedi al tuo partner di mostrare di nuovo il codice QR: in ContoCantiere, Altro › «Invita il mio partner».","sur_app_store":"ContoCantiere sull’App Store","sur_google_play":"su Google Play","nom":"ContoCantiere"},"nl":{"titre_page":"Deelnemen aan een bouwproject — Stenen & Centen","rubrique":"Delen met je partner","titre":"Je partner nodigt je uit om <em style=\"font-style:normal;color:var(--accent)\">jullie bouwproject<\/em> te volgen","chapo":"Volg samen het budget, de uitgaven, de facturen en de offertes van hetzelfde bouwproject. Gratis, zonder account of e-mail.","telecharger":"Stenen &amp; Centen downloaden","deja":"Ik heb de app al: deelnemen","ios_1":"Installeer Stenen &amp; Centen via de App Store.","ios_2":"Open de app: de uitnodiging wordt vanzelf overgenomen. Tik op ‘Sta plakken toe’ als je iPhone erom vraagt.","ios_3":"Tik op ‘Deelnemen aan het bouwproject’. Klaar.","android_1":"Installeer Stenen &amp; Centen via Google Play.","android_2":"Open de app: de uitnodiging wordt vanzelf overgenomen.","android_3":"Tik op ‘Deelnemen aan het bouwproject’. Klaar.","ordinateur":"<strong style=\"color:#fff\">Open deze link op je telefoon<\/strong>, of scan de QR-code van je partner met de camera van je telefoon.","note":"Deze link geeft toegang tot het bouwproject: geef hem aan niemand anders door. De gegevens van het bouwproject zijn versleuteld op de telefoons; deze pagina en Stenen &amp; Centen kunnen ze niet lezen.","incomplet_titre":"Onvolledige uitnodigingslink","incomplet_texte":"Vraag je partner om de QR-code opnieuw te tonen: in Stenen &amp; Centen, Meer › ‘Mijn partner uitnodigen’.","sur_app_store":"Stenen &amp; Centen in de App Store","sur_google_play":"op Google Play","nom":"Stenen &amp; Centen"}}; // fin des textes
+(function () {
+  var langues = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "fr"];
+  var t = null, choisie = "fr";
+  for (var i = 0; i < langues.length && !t; i++) {
+    var c = String(langues[i]).slice(0, 2).toLowerCase();
+    if (TEXTES[c]) { t = TEXTES[c]; choisie = c; }
+  }
+  if (!t || choisie === "fr") return;
+  document.documentElement.lang = choisie;
+  document.title = t.titre_page;
+  var elements = document.querySelectorAll("[data-t]");
+  for (var j = 0; j < elements.length; j++) {
+    var cle = elements[j].getAttribute("data-t");
+    if (t[cle]) elements[j].innerHTML = t[cle];
+  }
+})();
+</script>
 <script>
 var lien = "https://mm4htvj7t7-droid.github.io/maconstruction/rejoindre#" + code;
 var appStore = "https://apps.apple.com/fr/app/id6825257791";
